@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "commonjs",
   "directories": {
     "test": "tests"
   },
-  "scripts": {},
+  "scripts": {
+    "test:ui": "cmd /V /C \"set NODE_OPTIONS=--dns-result-order=ipv4first&& npx playwright test --ui\""
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.61.0",
     "@types/node": "^26.0.0"
