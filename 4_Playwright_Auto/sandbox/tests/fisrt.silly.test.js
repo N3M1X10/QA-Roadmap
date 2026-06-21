@@ -1,0 +1,31 @@
+// @ts-check
+const { test, expect } = require('@playwright/test');
+
+test('Успешная авторизация с валидными учетными данными', async ({ page }) => {
+    // 1. Arrange: Открываем страницу авторизации
+    await page.goto('https://www.saucedemo.com/');
+
+    // 2. Act: Вводим логин, пароль и нажимаем кнопку входа
+    await page.locator('#user-name').fill('standard_user');
+    await page.locator('#password').fill('secret_sauce');
+    await page.locator('#login-button').click();
+
+    // 3. Assert: Проверяем, что после логина появился заголовок страницы товаров
+    const inventoryTitle = page.locator('.title');
+    await expect(inventoryTitle).toHaveText('Products');
+});
+
+test('Ошибка авторизации при неверном пароле', async ({ page }) => {
+    // 1. Arrange
+    await page.goto('https://www.saucedemo.com/');
+
+    // 2. Act: Вводим правильный логин, но неверный пароль
+    await page.locator('#user-name').fill('standard_user');
+    await page.locator('#password').fill('123456789');
+    await page.locator('#login-button').click();
+
+    // 3. Assert: Проверяем, что появилось сообщение об ошибке
+    const errorMessage = page.locator('[data-test="error"]');
+    await expect(errorMessage).toBeVisible();
+    await expect(errorMessage).toContainText('Epic sadface: Username and password do not match');
+});
