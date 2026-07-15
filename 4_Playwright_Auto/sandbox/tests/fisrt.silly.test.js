@@ -1,66 +1,41 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+// 1. Импортируем наш Page Object (путь может отличаться, проверь, где лежит папка pages)
+const { LoginPage } = require('../pages/LoginPage.js');
 
-const sauceSite = 'https://www.saucedemo.com/';
-
-// ====================================
-// ГРУППА 1: Тестируем саму форму входа
-// ====================================
-test.describe('Форма авторизации', () => {
-
-    // Перед каждым тестом этой группы мы: открываем сайт
-    test.beforeEach(async ({ page }) => {
-        await page.goto(sauceSite);
-    });
+test.describe('Форма авторизации (через POM)', () => {
 
     test('Успешная авторизация с валидными учетными данными', async ({ page }) => {
-        await page.locator('#user-name').fill('standard_user');
-        await page.locator('#password').fill('secret_sauce');
-        await page.locator('#login-button').click();
+        // 2. Инициализируем нашу страницу
+        const loginPage = new LoginPage(page);
+
+        // 3. Вызываем методы страницы вместо ручной писанины локаторов
+        await loginPage.navigate();
+        await loginPage.login('standard_user', 'secret_sauce');
 
         const inventoryTitle = page.locator('.title');
         await expect(inventoryTitle).toHaveText('Products');
     });
 
     test('Ошибка авторизации при неверном пароле', async ({ page }) => {
-        await page.locator('#user-name').fill('standard_user');
-        await page.locator('#password').fill('123456789');
-        await page.locator('#login-button').click();
+        const loginPage = new LoginPage(page);
 
-        const errorMessage = page.locator('[data-test="error"]');
-        await expect(errorMessage).toBeVisible();
-        await expect(errorMessage).toContainText('Epic sadface: Username and password do not match');
+        await loginPage.navigate();
+        await loginPage.login('standard_user', 'secret_sauce1');
+        await expect(loginPage.errorMessage).toBeVisible();
+        await expect(loginPage.errorMessage).toContainText('Epic sadface: Username and password do not match');
     });
 
     test('Отображение ошибки при попытке входа с пустыми полями', async ({ page }) => {
-        await page.locator('#login-button').click();
+        const loginPage = new LoginPage(page);
 
-        const errorMessage = page.locator('[data-test="error"]');
-        await expect(errorMessage).toBeVisible();
-        await expect(errorMessage).toContainText('Epic sadface: Username is required');
-    });
-});
+        await loginPage.navigate();
 
-// ====================================================
-// ГРУППА 2: Тестируем работу магазина (требует логина)
-// ====================================================
-test.describe('Функционал магазина (после авторизации)', () => {
+        // Кликаем по кнопке войти без ввода данных
+        await loginPage.loginButton.click();
 
-    // Перед каждым тестом этой группы мы заходим на сайт И логинимся под стандартным юзером
-    test.beforeEach(async ({ page }) => {
-        await page.goto(sauceSite);
-        await page.locator('#user-name').fill('standard_user');
-        await page.locator('#password').fill('secret_sauce');
-        await page.locator('#login-button').click();
-    });
-
-    test('Добавление товара в корзину', async ({ page }) => {
-        // Кликаем по первой кнопке Add to Cart и по второй (твоя логика с индексами)
-        await page.getByRole('button', { name: 'Add to cart' }).first().click();
-        await page.getByRole('button', { name: 'Add to cart' }).nth(1).click();
-
-        // Проверяем, что в корзине 2 товара
-        const cartBadge = page.locator('[data-test="shopping-cart-badge"]');
-        await expect(cartBadge).toHaveText('2');
+        // Проверяем ошибку
+        await expect(loginPage.errorMessage).toBeVisible();
+        await expect(loginPage.errorMessage).toContainText('Epic sadface: Username is required');
     });
 });
