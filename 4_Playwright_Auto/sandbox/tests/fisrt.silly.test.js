@@ -1,19 +1,14 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
-// some DRY in there
 const sauceSite = 'https://www.saucedemo.com/';
 
-test('Успешная авторизация с валидными учетными данными', async ({ page }) => {
-    // 1. Arrange: Открываем страницу авторизации
-    await page.goto(sauceSite);
+// ====================================
+// ГРУППА 1: Тестируем саму форму входа
+// ====================================
+test.describe('Форма авторизации', () => {
 
-    // 2. Act: Вводим логин, пароль и нажимаем кнопку входа
-    await page.locator('#user-name').fill('standard_user');
-    await page.locator('#password').fill('secret_sauce');
-    var login_btn = page.getByRole('button', { name: 'Login' });
-    await login_btn.click();
-    // await page.locator('#login-button').click();
+    // Перед каждым тестом этой группы мы: открываем сайт
 
     // 3. Assert: Проверяем, что после логина появился заголовок страницы товаров
     const inventoryTitle = page.locator('.title');
