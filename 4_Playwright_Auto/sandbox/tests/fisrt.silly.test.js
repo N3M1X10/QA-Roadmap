@@ -10,7 +10,9 @@ test('Успешная авторизация с валидными учетны
     // 2. Act: Вводим логин, пароль и нажимаем кнопку входа
     await page.locator('#user-name').fill('standard_user');
     await page.locator('#password').fill('secret_sauce');
-    await page.locator('#login-button').click();
+    var login_btn = page.getByRole('button', { name: 'Login' });
+    await login_btn.click();
+    // await page.locator('#login-button').click();
 
     // 3. Assert: Проверяем, что после логина появился заголовок страницы товаров
     const inventoryTitle = page.locator('.title');
