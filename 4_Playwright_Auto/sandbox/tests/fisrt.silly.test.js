@@ -1,6 +1,7 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+// some DRY in there
 const sauceSite = 'https://www.saucedemo.com/';
 
 test('Успешная авторизация с валидными учетными данными', async ({ page }) => {
