@@ -5,7 +5,7 @@ class LoginPage {
     constructor(page) {
         this.page = page;
 
-        // Наш склад локаторов для страницы входа
+        // Склад локаторов для страницы входа
         this.usernameInput = page.locator('#user-name');
         this.passwordInput = page.locator('#password');
         this.loginButton = page.locator('#login-button');
